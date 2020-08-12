@@ -16,7 +16,10 @@ hr {
 
 h4 {
   cursor: pointer;
+  display: inline;
+  margin-right: 1rem;
 }
+
 
 button {
   display: block;

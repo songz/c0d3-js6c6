@@ -1,50 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import sendQuery from '../utils/sendQuery';
+import useQuery from '../utils/useQuery';
 import PokemonSelection from '../components/PokemonSelection';
+import Stars from '../components/Stars';
 
 const PokemonLessons = ({ name, image }) => {
-  const [userLessons, setUserLessons] = useState({});
-  const [lessons, setLessons] = useState({});
   const [update, setUpdate] = useState(0);
+  const [{ result }, runQuery] = useQuery();
+
+  useEffect(() => {
+    (async function () {
+      runQuery(`{
+        user {lessons {title, rating}},
+        lessons {title}
+      }`);
+    })();
+  }, [update]);
 
   const enrollLesson = (lesson) => {
-    sendQuery(`mutation {enroll(title: "${lesson}") {name}}`).then((data) => {
-      if (data.enroll.name) {
-        setUpdate(!update);
-      }
-    });
+    runQuery(`mutation {enroll(title: "${lesson}") {name}}`);
+    setUpdate(!update);
   };
 
   const unenrollLesson = (lesson) => {
-    sendQuery(`mutation {unenroll(title: "${lesson}") {name}}`).then((data) => {
-      if (data.unenroll.name) {
-        setUpdate(!update);
-      }
-    });
+    runQuery(`mutation {unenroll(title: "${lesson}") {name}}`);
+    setUpdate(!update);
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      const queryResult = await sendQuery(`{
-        user {lessons {title}},
-        lessons {title}
-      }`);
+  const rateLesson = (lesson, rating) => {
+    runQuery(`mutation {rate(title: "${lesson}", rating: ${rating}) {name}}`);
+    setUpdate(!update);
+  };
 
-      const enrolled = queryResult.user.lessons.reduce((acc, lesson) => {
-        acc[lesson.title] = true;
+  const enrolled =
+    (result.user &&
+      result.user.lessons.reduce((acc, lesson) => {
+        acc[lesson.title] = lesson.rating;
         return acc;
-      }, {});
+      }, {})) ||
+    {};
 
-      const unenrolled = queryResult.lessons.reduce((acc, lesson) => {
-        if (!enrolled[lesson.title]) acc[lesson.title] = true;
+  const unenrolled =
+    (result.lessons &&
+      result.lessons.reduce((acc, lesson) => {
+        if (!enrolled.hasOwnProperty(lesson.title)) acc[lesson.title] = true;
         return acc;
-      }, {});
-
-      setUserLessons(enrolled);
-      setLessons(unenrolled);
-    }
-    fetchData();
-  }, [update]);
+      }, {})) ||
+    {};
 
   return (
     <div>
@@ -52,16 +53,29 @@ const PokemonLessons = ({ name, image }) => {
       <div className="enrolled">
         <hr />
         <h2>Enrolled</h2>
-        {Object.keys(userLessons).map((lesson) => {
-          return <h4 key={lesson} onClick={() => unenrollLesson(lesson)}>{lesson}</h4>;
+        <p>Click on a star to rate a lesson, or click on the lesson name to unenroll</p>
+        {Object.keys(enrolled).map((lesson) => {
+          return (
+            <div key={lesson} style={{ marginTop: '1rem' }}>
+              <h4 onClick={() => unenrollLesson(lesson)}>{lesson}</h4>
+              <Stars
+                initialRating={enrolled[lesson]}
+                onClick={(rating) => rateLesson(lesson, rating)}
+              />
+            </div>
+          );
         })}
       </div>
       <div className="unenrolled">
         <hr />
         <h2>Not Enrolled</h2>
-        <p>Click to enroll</p>
-        {Object.keys(lessons).map((lesson) => {
-          return <h4 key={lesson} onClick={() => enrollLesson(lesson)}>{lesson}</h4>;
+        <p>Click on the lesson name to enroll</p>
+        {Object.keys(unenrolled).map((lesson) => {
+          return (
+            <div key={lesson} style={{ marginTop: '1rem' }}>
+              <h4 onClick={() => enrollLesson(lesson)}>{lesson}</h4>
+            </div>
+          );
         })}
       </div>
     </div>

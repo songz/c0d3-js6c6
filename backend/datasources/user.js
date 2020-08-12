@@ -37,6 +37,10 @@ class UserAPI extends DataSource {
   unenroll(title) {
     return this.store.unenroll(this.session.userid, title);
   }
+
+  rate(title, rating) {
+    return this.store.rate(this.session.userid, title, rating);
+  }
 }
 
 module.exports = UserAPI;

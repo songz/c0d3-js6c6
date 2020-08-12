@@ -1,10 +1,6 @@
-* {
-  font-family: sans-serif;
-  box-sizing: border-box;
-}
-
 .stars-container {
-  font-size: 30px;
+  display: inline-block;
+  font-size: 20px;
 }
 
 .stars-container > .fas {

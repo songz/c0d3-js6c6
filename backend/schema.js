@@ -2,7 +2,8 @@ const { gql } = require('apollo-server-express');
 
 module.exports.typeDefs = gql`
   type Lesson {
-    title: String
+    title: String!
+    rating: Int
   },
 
   type BasicPokemon {
@@ -31,6 +32,7 @@ module.exports.typeDefs = gql`
   type Mutation {
     enroll(title: String!): User
     unenroll(title: String!): User
+    rate(title: String!, rating: Int!): User
   }
 `;
 
@@ -48,5 +50,6 @@ module.exports.resolvers = {
   Mutation: {
     enroll: async (_, { title }, { dataSources }) => dataSources.userAPI.enroll(title),
     unenroll: async (_, { title }, { dataSources }) => dataSources.userAPI.unenroll(title),
+    rate: async (_, { title, rating }, {dataSources }) => dataSources.userAPI.rate(title, rating),
   },
 };

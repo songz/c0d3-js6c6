@@ -64,5 +64,15 @@ module.exports.createUserStore = () => {
     return users[id];
   };
 
+  users.rate = (id, title, rating) => {
+    users[id].lessons.find((lesson) => {
+      if (lesson.title === title) {
+        lesson.rating = rating;
+        return true;
+      }
+    });
+    return users[id];
+  }
+
   return users;
 };

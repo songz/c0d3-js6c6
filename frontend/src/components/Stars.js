@@ -14,12 +14,13 @@ const Star = ({ selected, onClick, onMouseEnter }) => {
   );
 };
 
-const Stars = () => {
-  const [rating, setRating] = React.useState(0);
+const Stars = ({onClick, initialRating }) => {
+  const [rating, setRating] = React.useState(initialRating);
   const [isClicked, setClicked] = React.useState(false);
 
   const handleClick = (i) => {
     setClicked(true);
+    onClick(i);
     setRating(i);
   };
 
@@ -28,18 +29,16 @@ const Stars = () => {
   };
 
   return (
-    <main>
-      <div className="stars-container" onMouseEnter={() => setClicked(false)}>
-        {ratings.map((i) => (
-          <Star
-            key={i}
-            selected={rating >= i}
-            onClick={() => handleClick(i)}
-            onMouseEnter={() => handleMouseEnter(i)}
-          />
-        ))}
-      </div>
-    </main>
+    <span className="stars-container" onMouseEnter={() => setClicked(false)}>
+      {ratings.map((i) => (
+        <Star
+          key={i}
+          selected={rating >= i}
+          onClick={() => handleClick(i)}
+          onMouseEnter={() => handleMouseEnter(i)}
+        />
+      ))}
+    </span>
   );
 };
 
