@@ -1,0 +1,24 @@
+{
+  "name": "js6c2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "ggwadera",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-datasource": "^0.7.2",
+    "apollo-datasource-rest": "^0.9.3",
+    "apollo-server-express": "^2.16.1",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "uuid": "^8.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}

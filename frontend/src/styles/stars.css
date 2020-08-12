@@ -1,0 +1,14 @@
+* {
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+.stars-container {
+  font-size: 30px;
+}
+
+.stars-container > .fas {
+  -webkit-text-stroke-width: 3px;
+  -webkit-text-stroke-color: black;
+  color: yellow;
+}

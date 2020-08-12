@@ -1,0 +1,23 @@
+input {
+  width: 100%;
+}
+
+hr {
+  margin: 0.5rem 0;
+}
+
+.match {
+  background-color: rgba(0, 255, 0, 0.3);
+}
+
+.suggestions h3 {
+  cursor: pointer;
+}
+
+h4 {
+  cursor: pointer;
+}
+
+button {
+  display: block;
+}
