@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 const useQuery = () => {
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState({});
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 

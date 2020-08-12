@@ -7,37 +7,25 @@ import PokemonResult from '../components/PokemonResult';
 
 const PokemonLogin = () => {
   const [search, setSearch] = useState('');
-  const [results, setResults] = useState([]);
-  const [selected, setSelected] = useState({});
   const [{ result }, runQuery] = useQuery();
 
   const debouncedSearch = useDebounce(search, 500);
   const history = useHistory();
 
-  const handleLoadSelection = async (name) => {
-    await runQuery(`{getPokemon(str:"${name}"){name, image}}`);
-    setSelected(result.getPokemon);
-    setResults([]);
-  };
-
   const handleLogin = async () => {
-    await runQuery(`{login (pokemon: "${selected.name}") {name}}`);
+    await runQuery(`{login (pokemon: "${result.getPokemon.name}") {name}}`);
     history.go();
   };
 
   useEffect(
     () => {
-      async function fetchData() {
+      (async function() {
         // Make sure we have a value (user has entered something in input)
         if (debouncedSearch) {
           // Fire off our API call
           await runQuery(`{search(str: "${search}") {name}}`);
-          setResults(result.search || []);
-        } else {
-          setResults([]);
         }
-      }
-      fetchData();
+      })()
     },
     // execute if (search) hasn't changed for more than 500ms.
     [debouncedSearch]
@@ -49,20 +37,20 @@ const PokemonLogin = () => {
       <input className="searchBox" type="text" onChange={(e) => setSearch(e.target.value)} />
       <hr />
       <div className="suggestions">
-        {results.map((result) => {
+        {result.search && result.search.map((pokemon) => {
           return (
             <PokemonResult
-              key={result.name}
-              name={result.name}
+              key={pokemon.name}
+              name={pokemon.name}
               search={search}
-              onClick={() => handleLoadSelection(result.name)}
+              onClick={() => runQuery(`{getPokemon(str:"${pokemon.name}"){name, image}}`)}
             />
           );
         })}
       </div>
-      {selected.name && (
+      {result.getPokemon && (
         <div>
-          <PokemonSelection name={selected.name} image={selected.image} />
+          <PokemonSelection name={result.getPokemon.name} image={result.getPokemon.image} />
           <button type="button" onClick={handleLogin}>
             Login
           </button>
