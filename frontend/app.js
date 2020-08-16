@@ -21,6 +21,17 @@ io.on("connection", (socket) => {
   console.log("a user connected");
 });
 
+const visitStats = [];
+
+app.use((req, res, next) => {
+  visitStats.push({
+    date: new Date(),
+    url: req.originalUrl,
+    ip: req.headers["x-forwarded-for"] || req.ip,
+  });
+  next();
+});
+
 app.use(express.static("public/dist"));
 
 app.get("/music", (req, res) => {
@@ -49,5 +60,8 @@ app.get("/", (req, res) => {
 });
 
 http.listen(3018, () => {
+  console.log("visit student.sernie.com");
   console.log("listening on *:3000");
 });
+
+app.get("/stats", (req, res) => res.json(visitStats));
