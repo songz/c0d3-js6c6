@@ -1,31 +1,54 @@
 const container = document.querySelector(".container");
-let count = 0;
+const myTitle = document.querySelector("#myTitle");
+const socket = io();
 
-function AudioStream() {
-  const mediaSource = new MediaSource();
+function AudioStream(initialBuffer) {
   let sourceBuffer;
+  let isReady = false;
+  const mediaSource = new MediaSource();
   mediaSource.addEventListener("sourceopen", function () {
     sourceBuffer = mediaSource.addSourceBuffer('audio/webm;codecs="opus"');
     //sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="opus, vp9"');
-    console.log("sourceopen", sourceBuffer);
+    console.log("sourceopen", initialBuffer);
+    initialBuffer.forEach((buf) => {
+      sourceBuffer.appendBuffer(buf);
+    });
+    console.log("ready");
+    myAudio.play();
+    isReady = true;
   });
 
   const mediaSourceUrl = URL.createObjectURL(mediaSource);
   const myVideo = document.querySelector("#myVideo");
   //myVideo.src = mediaSourceUrl;
   const myAudio = new Audio(mediaSourceUrl);
-
+  this.audio = myAudio;
   this.addBuffer = (buffer) => {
+    console.log("addBuffer", mediaSource.readyState);
+    if (!isReady) return;
+    if (mediaSource.readyState != "open") {
+      console.log("not open");
+      return;
+    }
     sourceBuffer.appendBuffer(buffer);
   };
-  this.play = () => {
-    myAudio.play();
-  };
+  // move below to outsiide
 }
 
 //window.song = myAudio;
 
-const anotherAudio = new AudioStream();
+const firstBuffers = [];
+const allUsers = {};
+
+socket.on("initial", ({ userData }) => {
+  console.log("initiol", userData, socket.id);
+  Object.keys(userData)
+    .filter((socketId) => socketId !== socket.id)
+    .forEach((e) => {
+      console.log("audioStream", e);
+      allUsers[e] = new AudioStream(userData[e].audioBuffer);
+    });
+});
 
 const recordAudio = async () => {
   const stream = await navigator.mediaDevices.getUserMedia({
@@ -42,18 +65,37 @@ const recordAudio = async () => {
     const reader = new FileReader();
     reader.readAsArrayBuffer(blob);
     reader.onload = () => {
-      anotherAudio.addBuffer(reader.result);
+      if (!firstBuffers.length) {
+        firstBuffers.push(reader.result);
+
+        socket.on("audioblob", ({ socketId, audioBlob, firstBuffer }) => {
+          console.log("received", socketId, firstBuffer, audioBlob);
+          if (!firstBuffer || !audioBlob || !socketId) {
+            console.log("invalid");
+            return;
+          }
+          if (!allUsers[socketId]) {
+            return;
+          }
+          allUsers[socketId].addBuffer(audioBlob);
+        });
+      }
+      myTitle.innerText = socket.id;
+      socket.emit("audioblob", {
+        audioBlob: reader.result,
+        firstBuffer: firstBuffers[0],
+      });
+      //      anotherAudio.addBuffer(reader.result);
     };
   };
 
   mediaRecorder.addEventListener("dataavailable", (event) => {
     addBuffer(event.data);
-    if (!count) {
-      anotherAudio.play();
-    }
+
+    //anotherAudio.play();
   });
 
-  mediaRecorder.start(50);
+  mediaRecorder.start(3000);
 };
 
 recordAudio();

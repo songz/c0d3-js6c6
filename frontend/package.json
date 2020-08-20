@@ -12,9 +12,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-router-dom": "^5.2.0"
+    "react-router-dom": "^5.2.0",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",

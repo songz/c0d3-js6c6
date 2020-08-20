@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import useQuery from '../utils/useQuery'
+import React, { useState, useEffect } from "react";
+import useQuery from "../utils/useQuery";
 
-import PokemonLogin from './PokemonLogin';
-import PokemonLessons from './PokemonLessons';
+import PokemonLogin from "./PokemonLogin";
+import PokemonLessons from "./PokemonLessons";
 
-import '../styles/pokemon.css';
+import "../styles/pokemon.css";
 
 const PokemonLanding = () => {
-  const [ {result, isLoading}, runQuery ] = useQuery()
+  const [{ result, isLoading, error }, runQuery] = useQuery();
+  console.log("isLoading", isLoading);
+  console.log("resut", result, error);
 
   useEffect(() => {
-    (async function() {
-      await runQuery('{user {name, image}}');
+    (async function () {
+      await runQuery("{user {name, image}}");
     })();
   }, []);
 
@@ -21,7 +23,11 @@ const PokemonLanding = () => {
 
   return (
     <main>
-      {result.user ? <PokemonLessons name={result.user.name} image={result.user.image} /> : <PokemonLogin />}
+      {result.user ? (
+        <PokemonLessons name={result.user.name} image={result.user.image} />
+      ) : (
+        <PokemonLogin />
+      )}
     </main>
   );
 };

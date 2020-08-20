@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 const useQuery = () => {
   const [result, setResult] = useState(null);
@@ -9,23 +9,23 @@ const useQuery = () => {
     { result, error, isLoading },
     (query) => {
       setIsLoading(true);
-      return fetch('/graphql', {
-        method: 'POST',
-        credentials: 'include',
+      return fetch("https://js5.c0d3.com/js6c2/graphql", {
+        method: "POST",
+        credentials: "include",
         headers: {
-          'content-type': 'application/json'
+          "content-type": "application/json",
         },
         body: JSON.stringify({
           operationName: null,
           variables: {},
-          query: query
-        })
+          query: query,
+        }),
       })
         .then((r) => r.json())
         .then((res) => setResult(res.data))
         .catch((err) => setError(err))
         .finally(() => setIsLoading(false));
-    }
+    },
   ];
 };
 

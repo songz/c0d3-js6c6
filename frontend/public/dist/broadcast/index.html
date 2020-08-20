@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>JS6 Challenge 4</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css"
+      integrity="sha512-xA6Hp6oezhjd6LiLZynuukm80f8BoZ3OpcEYaqKoCV3HKQDrYjDE1Gu8ocxgxoXmwmSzM4iqPvCsOkQNiu41GA=="
+      crossorigin="anonymous"
+    />
+  </head>
+  <style>
+.block {
+  border: 1px solid #aaa;
+  width: 50px;
+  height: 50px;
+  display: inline-block;
+  text-align:center;
+  margin: 5px;
+  cursor: pointer;
+  padding-top: 5px;
+  box-sizing: border-box;
+  background-color: #eee;
+}
+.container {
+  width: 960px;
+  margin: auto;
+}
+  </style>
+  <body>
+    <div id="root"></div>
+    <div class='container'></div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/song.js"></script>
+  </body>
+</html>

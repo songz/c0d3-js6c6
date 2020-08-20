@@ -1,15 +1,44 @@
 const express = require("express");
 const fs = require("fs");
 const app = express();
-
+const session = require("express-session");
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
+
+const sessionMiddleware = session({
+  secret: "keyboard cat",
+  resave: false,
+  saveUninitialized: false,
+});
+
+app.use(sessionMiddleware);
+
+// enable socket.io to use req.session
+io.use((socket, next) => {
+  sessionMiddleware(socket.request, {}, next);
+});
 
 let wrote = false;
 let fileBlob = [];
 
+let userData = {};
+
 io.on("connection", (socket) => {
-  socket.on("audioblob", ({ audioBlob }) => {
+  socket.emit("initial", { userData });
+  //  io.emit("audioblob", "hinga diing");
+  socket.on("audioblob", ({ audioBlob, firstBuffer }) => {
+    //change from io.emit to socket.broadcast.emit when testing with 2nd machine
+    const socketData = userData[socket.id] || {
+      audioBuffer: [],
+    };
+    socketData.audioBuffer.push(audioBlob);
+    userData[socket.id] = socketData;
+    socket.broadcast.emit("audioblob", {
+      socketId: socket.id,
+      audioBlob,
+      firstBuffer,
+    });
+    /*
     console.log("audioblob writing");
     fileBlob.push(audioBlob);
     fs.appendFile("./public/dist/song.wav", audioBlob, (err) => {
@@ -17,8 +46,13 @@ io.on("connection", (socket) => {
       console.log('The "data to append" was appended to file!');
     });
     wrote = true;
+    */
   });
   console.log("a user connected");
+});
+
+app.get("/testingpoo", (req, res) => {
+  res.send("hoopla");
 });
 
 const visitStats = [];
